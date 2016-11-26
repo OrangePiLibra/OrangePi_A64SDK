@@ -164,8 +164,6 @@
             clock-mult = <0x00000008>;
             clock-div = <0x00000001>;
             clock-output-names = "pll_audiox8";
-			linux,phandle = <0x000000f3>;
-			phandle = <0x000000f3>;
         };
         pll_audiox4 {
             #clock-cells = <0x00000000>;
@@ -482,8 +480,8 @@
             #clock-cells = <0x00000000>;
             compatible = "allwinner,sunxi-periph-clock";
             clock-output-names = "csi_s";
-            linux,phandle = <0x00000058>;
-            phandle = <0x00000058>;
+            linux,phandle = <0x00000073>;
+            phandle = <0x00000073>;
         };
         csi_m {
             #clock-cells = <0x00000000>;
@@ -1206,9 +1204,9 @@
             uart3@0 {
                 linux,phandle = <0x000000a5>;
                 phandle = <0x000000a5>;
-                allwinner,pins = "PH4", "PH5", "PH6", "PH7";
+                allwinner,pins = "PD0", "PD1";
                 allwinner,function = "uart3";
-                allwinner,pname = "uart3_tx", "uart3_rx", "uart3_rts", "uart_cts";
+                allwinner,pname = "uart3_tx", "uart3_rx";
                 allwinner,muxsel = <0x00000003>;
                 allwinner,pull = <0x00000001>;
                 allwinner,drive = <0xffffffff>;
@@ -1571,7 +1569,7 @@
             pinctrl-1 = <0x00000026>;
             uart4_port = <0x00000004>;
             uart4_type = <0x00000004>;
-            status = "disabled";
+            status = "okay";
             pinctrl-0 = <0x000000a6>;
         };
         twi@0x01c2ac00 {
@@ -1613,25 +1611,25 @@
             clock-frequency = <0x00030d40>;
             pinctrl-names = "default", "sleep";
             pinctrl-1 = <0x0000002f>;
-            status = "okay";
+            status = "disabled";
             pinctrl-0 = <0x000000a1>;
         };
         usbc0@0 {
             device_type = "usbc0";
             compatible = "allwinner,sunxi-otg-manager";
-            usb_port_type = <0x00000001>;
-            usb_detect_type = <0x00000000>;
-            usb_host_init_state = <0x00000001>;
+            usb_port_type = <0x00000002>;
+            usb_detect_type = <0x00000001>;
+            usb_host_init_state = <0x00000000>;
             usb_regulator_io = "nocare";
-            usb_wakeup_suspend = <0x00000001>;
+            usb_wakeup_suspend = <0x00000000>;
             usb_luns = <0x00000003>;
             usb_serial_unique = <0x00000001>;
             usb_serial_number = "20080411";
             rndis_wceis = <0x00000001>;
             status = "okay";
-            usb_id_gpio = <0x00000030 0x00000007 0x00000009 0x00000000 0x00000001 0x00000000 0x00000000> ;
-            usb_det_vbus_gpio;
-            usb_drv_vbus_gpio = <0x00000030 0x00000003 0x00000007 0x00000001 0x00000000 0x00000000 0x00000000>;
+            usb_id_gpio = <0x00000030 0x00000007 0x00000009 0x00000000 0x00000001 0xffffffff 0xffffffff>;
+            usb_det_vbus_gpio = "axp_ctrl";
+            usb_drv_vbus_gpio = <0x00000031 0x0000fffe 0x00000003 0x00000001 0x00000000 0xffffffff 0x00000000>;
         };
         udc-controller@0x01c19000 {
             compatible = "allwinner,sunxi-udc";
@@ -1668,7 +1666,7 @@
             status = "okay";
             usb_port_type = <0x00000001>;
             usb_detect_type = <0x00000000>;
-            usb_drv_vbus_gpio = <0x00000031 0x0000000f 0x00000003 0x00000001 0x00000000 0xffffffff 0x00000000>;
+            usb_drv_vbus_gpio = <0x00000030 0x00000003 0x00000007 0x00000001 0x00000000 0xffffffff 0x00000000>;
             usb_hsic_rdy_gpio;
             usb_hsic_hub_connect_gpio;
             usb_hsic_int_n_gpio;
@@ -1693,7 +1691,7 @@
         codec@0x01c22c00 {
             compatible = "allwinner,sunxi-internal-codec";
             reg = <0x00000000 0x01c22c00 0x00000000 0x00000478 0x00000000 0x01f015c0 0x00000000 0x00000000>;
-            clocks = <0x0000003c 0x0000003c>;
+            clocks = <0x0000003c>;
             pinctrl-names = "aif2-default", "aif3-default", "aif2-sleep", "aif3-sleep";
             pinctrl-1 = <0x0000003e>;
             pinctrl-2 = <0x0000003f>;
@@ -1719,7 +1717,7 @@
             linux,phandle = <0x0000004d>;
             phandle = <0x0000004d>;
             device_type = "codec";
-			pinctrl-0 = <0x000000b5>;
+            pinctrl-0 = <0x000000b5>;
         };
         i2s0-controller@0x01c22c00 {
             compatible = "allwinner,sunxi-internal-i2s";
@@ -1807,7 +1805,7 @@
             aif2fmt = <0x00000003>;
             aif3fmt = <0x00000003>;
             aif2master = <0x00000001>;
-            hp_detect_case = <0x00000000>;
+            hp_detect_case = <0x00000001>;
             status = "okay";
             device_type = "sndcodec";
         };
@@ -2129,22 +2127,22 @@
             clocks = <0x00000073 0x00000074 0x00000075 0x00000004 0x00000006 0x00000005>;
             pinctrl-names = "default", "sleep";
             pinctrl-1 = <0x00000077>;
-            csi0_sensor_list = <0x00000000>;
+            csi0_sensor_list = <0x00000001>;
             status = "okay";
             pinctrl-0 = <0x000000b1>;
-            csi0_mck = <0x00000030 0x00000004 0x00000001 0x00000001 0x00000000 0x00000001 0x00000000>;
+            csi0_mck = <0x00000030 0x00000004 0x00000001 0x00000000 0x00000000 0x00000001 0x00000000>;
             dev@0 {
-                csi0_dev0_mname = "gc2035";
-                csi0_dev0_twi_addr = <0x00000078>;
+                csi0_dev0_mname = "s5k4ec";
+                csi0_dev0_twi_addr = <0x0000005a>;
                 csi0_dev0_pos = "rear";
-                csi0_dev0_isp_used = <0x00000000>;
+                csi0_dev0_isp_used = <0x00000001>;
                 csi0_dev0_fmt = <0x00000000>;
-                csi0_dev0_stby_mode = <0x00000000>;
+                csi0_dev0_stby_mode = <0x00000001>;
                 csi0_dev0_vflip = <0x00000000>;
                 csi0_dev0_hflip = <0x00000000>;
                 csi0_dev0_iovdd = "iovdd-csi";
                 csi0_dev0_iovdd_vol = <0x002ab980>;
-                csi0_dev0_avdd = "iovdd-csi";
+                csi0_dev0_avdd = "avdd-csi";
                 csi0_dev0_avdd_vol = <0x002ab980>;
                 csi0_dev0_dvdd = "dvdd-csi-18";
                 csi0_dev0_dvdd_vol = <0x0016e360>;
@@ -2155,13 +2153,13 @@
                 csi0_dev0_act_used = <0x00000000>;
                 csi0_dev0_act_name = "ad5820_act";
                 csi0_dev0_act_slave = <0x00000018>;
-                status = "okay";
+                status = "disabled";
                 device_type = "csi0_dev0";
                 csi0_dev0_afvdd;
                 csi0_dev0_afvdd_vol;
                 csi0_dev0_power_en;
-                csi0_dev0_reset = <0x00000030 0x00000004 0x00000010 0x00000001 0x00000000 0x00000001 0x00000000>;
-                csi0_dev0_pwdn = <0x00000030 0x00000004 0x00000011 0x00000001 0x00000000 0x00000001 0x00000000>;
+                csi0_dev0_reset = <0x00000030 0x00000004 0x00000010 0x00000000 0x00000000 0x00000001 0x00000000>;
+                csi0_dev0_pwdn = <0x00000030 0x00000004 0x00000011 0x00000000 0x00000000 0x00000001 0x00000000>;
                 csi0_dev0_flash_en;
                 csi0_dev0_flash_mode;
                 csi0_dev0_af_pwdn;
@@ -2373,7 +2371,7 @@
             regulator_count = <0x00000017>;
             status = "okay";
             device_type = "pmu0_regu";
-            regulator1 = "axp81x_dcdc1 none vcc-nand vcc-pe vcc-emmc vcc-sdc vcc-usb-30 vcc-io vcc-pd";
+            regulator1 = "axp81x_dcdc1 none vcc-nand vcc-emmc vcc-pe vcc-sdc vcc-usb-30 vcc-io vcc-pd";
             regulator2 = "axp81x_dcdc2 none vdd-cpua";
             regulator3 = "axp81x_dcdc3 none";
             regulator4 = "axp81x_dcdc4 none";
@@ -2381,16 +2379,16 @@
             regulator6 = "axp81x_dcdc6 none vdd-sys";
             regulator7 = "axp81x_dcdc7 none";
             regulator8 = "axp81x_rtc none";
-            regulator9 = "axp81x_aldo1 none vdd-csi-led vcc-wifi";
+            regulator9 = "axp81x_aldo1 none vdd-csi-led iovdd-csi";
             regulator10 = "axp81x_aldo2 none vcc-pl";
             regulator11 = "axp81x_aldo3 none vcc-avcc vcc-pll";
             regulator12 = "axp81x_dldo1 none vcc-hdmi-33";
-            regulator13 = "axp81x_dldo2 none vcc-mipi iovdd-csi";
+            regulator13 = "axp81x_dldo2 none vcc-mipi vcc-wifi";
             regulator14 = "axp81x_dldo3 none avdd-csi";
             regulator15 = "axp81x_dldo4 none vcc-deviceio vcc-wifi-io";
             regulator16 = "axp81x_eldo1 none vcc-cpvdd vcc-pc vcc-pg";
-            regulator17 = "axp81x_eldo2 none vcc-lcd-0 dvdd-csi-18";
-            regulator18 = "axp81x_eldo3 none";
+            regulator17 = "axp81x_eldo2 none vcc-lcd-0";
+            regulator18 = "axp81x_eldo3 none dvdd-csi-18";
             regulator19 = "axp81x_fldo1 none vcc-hsic-12";
             regulator20 = "axp81x_fldo2 none vdd-cpus";
             regulator21 = "axp81x_gpio0ldo none vcc-ctp";
@@ -2570,7 +2568,7 @@
         };
         eth@01c30000 {
             compatible = "allwinner,sunxi-gmac";
-            reg = <0x00000000 0x01c30000 0x00000000 0x00040000 0x00000000 0x01c00000 0x00000000 0x00000030>;
+            reg = <0x00000000 0x01c30000 0x00000000 0x00010000 0x00000000 0x01c00000 0x00000000 0x00000030>;
             pinctrl-names = "default";
             interrupts = <0x00000000 0x00000052 0x00000004>;
             interrupt-names = "gmacirq";
@@ -2578,8 +2576,8 @@
             clock-names = "gmac";
             phy-mode = "rgmii";
             tx-delay = <0x00000003>;
-            rx-delay = <0x0000001f>;
-            gmac_power1;
+            rx-delay = <0x00000000>;
+            gmac_power1 = "axp81x_dc1sw:0";
             status = "okay";
             device_type = "gmac0";
             pinctrl-0 = <0x0000009e>;
@@ -2609,11 +2607,11 @@
             dcdc6_vol = <0x000f468c>;
             aldo1_vol = <0x00000af0>;
             aldo2_vol = <0x000f4948>;
-            aldo3_vol = <0x000f4df8>;
+            aldo3_vol = <0x000f4f24>;
             dldo1_vol = <0x00000ce4>;
             dldo2_vol = <0x00000ce4>;
             dldo3_vol = <0x00000af0>;
-            dldo4_vol = <0x000f4f24>;
+            dldo4_vol = <0x00000ce4>;
             eldo1_vol = <0x000f4948>;
             eldo2_vol = <0x00000708>;
             eldo3_vol = <0x00000708>;
@@ -2624,8 +2622,7 @@
         card_boot {
             device_type = "card_boot";
             logical_start = <0x0000a000>;
-            sprite_gpio0 = <0x00000030 0x00000007 0x0000000b 0x00000001 0xffffffff 0xffffffff 0xffffffff>;
-			normal_gpio1 = <0x00000031 0x0000000f 0x00000000 0x00000001 0x00000005 0xffffffff 0xffffffff>;
+            sprite_gpio0;
         };
         pm_para {
             device_type = "pm_para";
@@ -3099,10 +3096,11 @@
         wlan_busnum = <0x00000001>;
         status = "okay";
         device_type = "wlan";
-        clocks = <0x00000098>;
+        clocks;
         wlan_power = "vcc-wifi";
-        wlan_regon = <0x00000079 0x0000000b 0x00000008 0x00000001 0xffffffff 0xffffffff 0x00000000>;
-        wlan_hostwake = <0x00000079 0x0000000b 0x00000007 0x00000006 0xffffffff 0xffffffff 0x00000000>;
+        wlan_regon = <0x00000079 0x0000000b 0x00000002 0x00000001 0xffffffff 0xffffffff 0x00000000>;
+        wlan_hostwake = <0x00000079 0x0000000b 0x00000003 0x00000006 0xffffffff 0xffffffff 0x00000000>;
+        efuse_map_path = "wifi_efuse_8189e_for_MB1019Q5.map";
     };
     bt {
         compatible = "allwinner,sunxi-bt";
@@ -3116,9 +3114,10 @@
     btlpm {
         compatible = "allwinner,sunxi-btlpm";
         uart_index = <0x00000001>;
-        status = "disabled";
+        status = "okay";
         device_type = "btlpm";
         bt_wake = <0x00000079 0x0000000b 0x00000006 0x00000001 0xffffffff 0xffffffff 0x00000001>;
         bt_hostwake = <0x00000079 0x0000000b 0x00000005 0x00000006 0xffffffff 0xffffffff 0x00000000>;
     };
 };
+

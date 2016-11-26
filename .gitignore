@@ -117,4 +117,5 @@ output/
 
 !/external/bl31.bin
 !/external/scp.bin
+/external/Android.dts
 
