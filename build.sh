@@ -284,12 +284,12 @@ elif [ $OPTION = '9' ]; then
 	cd $SCRIPTS
 	sudo ./uboot_update.sh $UBOOT_PATH
 	exit 0
-elif [ $OPTION = 'a' ]; then
+elif [ $OPTION = "10" ]; then
 	clear
 	echo -e "\e[1;31m Updating SDK to Github \e[0m"
 	git push -u origin master
 	exit 0
-elif [ $OPTION = 'b' ]; then
+elif [ $OPTION = "11" ]; then
 	clear
 	echo -e "\e[1;31m Updating SDK from Github \e[0m"
 	git pull

@@ -32,6 +32,7 @@
 #include <linux/pm.h>
 #include <linux/of_gpio.h>
 #include <linux/sys_config.h>
+#include <linux/orangepi_debug.h>
 #include "sunxi_codec.h"
 #include "sunxi_rw_func.h"
 
@@ -40,6 +41,8 @@
 #define codec_FORMATS (SNDRV_PCM_FMTBIT_S8 | SNDRV_PCM_FMTBIT_S16_LE | \
 		                     SNDRV_PCM_FMTBIT_S18_3LE | SNDRV_PCM_FMTBIT_S20_3LE | SNDRV_PCM_FMTBIT_S24_LE | SNDRV_PCM_FMTBIT_S32_LE)
 #define DRV_NAME "sunxi-internal-codec"
+
+#define line() _debug("[SOC]%s %d\n", __func__, __LINE__)
 
 void __iomem *codec_digitaladress;
 void __iomem *codec_analogadress;
@@ -270,30 +273,55 @@ static void adchpf_enable(struct snd_soc_codec *codec,bool on)
 static int codec_init(struct sunxi_codec *sunxi_internal_codec)
 {
 	int ret = 0;
-
+	
+	line();
 	snd_soc_write(sunxi_internal_codec->codec, HP_CAL_CTRL, 0x87);
+	line();
 	snd_soc_update_bits(sunxi_internal_codec->codec, SPKOUT_CTRL1, (0x1f<<SPKOUT_VOL), (sunxi_internal_codec->gain_config.spkervol<<SPKOUT_VOL));
+	line();
 	snd_soc_update_bits(sunxi_internal_codec->codec, HP_CTRL, (0x3f<<HPVOL), (sunxi_internal_codec->gain_config.headphonevol<<HPVOL));
+	line();
 	snd_soc_update_bits(sunxi_internal_codec->codec, EARPIECE_CTRL1, (0x1f<<ESP_VOL), (sunxi_internal_codec->gain_config.earpiecevol<<ESP_VOL));
+	line();
 	snd_soc_update_bits(sunxi_internal_codec->codec, MIC1_CTRL, (0x7<<MIC1BOOST), (sunxi_internal_codec->gain_config.maingain<<MIC1BOOST));
+	line();
 	snd_soc_update_bits(sunxi_internal_codec->codec, MIC2_CTRL, (0x7<<MIC2BOOST), (sunxi_internal_codec->gain_config.headsetmicgain<<MIC2BOOST));
+	line();
 
-	if (sunxi_internal_codec->hwconfig.adcagc_cfg)
+	if (sunxi_internal_codec->hp_en) {
+		line();
+		clk_prepare_enable(sunxi_internal_codec->hp_en);
+	}
+
+	if (sunxi_internal_codec->hwconfig.adcagc_cfg) {
+		line();
 		adcagc_config(sunxi_internal_codec->codec);
+	}
 
-	if (sunxi_internal_codec->hwconfig.adcdrc_cfg)
+	if (sunxi_internal_codec->hwconfig.adcdrc_cfg) {
+		line();
 		adcdrc_config(sunxi_internal_codec->codec);
+	}
 
-	if (sunxi_internal_codec->hwconfig.adchpf_cfg)
+	if (sunxi_internal_codec->hwconfig.adchpf_cfg) {
+		line();
 		adchpf_config(sunxi_internal_codec->codec);
+	}
 
-	if (sunxi_internal_codec->hwconfig.dacdrc_cfg)
+	if (sunxi_internal_codec->hwconfig.dacdrc_cfg) {
+		line();
 		dacdrc_config(sunxi_internal_codec->codec);
+	}
 
-	if (sunxi_internal_codec->hwconfig.dachpf_cfg)
+	if (sunxi_internal_codec->hwconfig.dachpf_cfg) {
+		line();
 		dachpf_config(sunxi_internal_codec->codec);
+	}
+
 	if (sunxi_internal_codec->aif_config.aif2config || sunxi_internal_codec->aif_config.aif3config) {
+		line();
 		if (!sunxi_internal_codec->pinctrl) {
+			line();
 			sunxi_internal_codec->pinctrl = devm_pinctrl_get(sunxi_internal_codec->codec->dev);
 			if (IS_ERR_OR_NULL(sunxi_internal_codec->pinctrl)) {
 				pr_warn("[audio-codec]request pinctrl handle for audio failed\n");
@@ -303,7 +331,9 @@ static int codec_init(struct sunxi_codec *sunxi_internal_codec)
 	}
 
 	if (sunxi_internal_codec->aif_config.aif2config) {
+		line();
 		if (!sunxi_internal_codec->aif2_pinstate){
+			line();
 			sunxi_internal_codec->aif2_pinstate = pinctrl_lookup_state(sunxi_internal_codec->pinctrl, "aif2-default");
 			if (IS_ERR_OR_NULL(sunxi_internal_codec->aif2_pinstate)) {
 				pr_warn("[audio-codec]lookup aif2-default state failed\n");
@@ -312,28 +342,36 @@ static int codec_init(struct sunxi_codec *sunxi_internal_codec)
 		}
 
 		if (!sunxi_internal_codec->aif2sleep_pinstate){
+			line();
 			sunxi_internal_codec->aif2sleep_pinstate = pinctrl_lookup_state(sunxi_internal_codec->pinctrl, "aif2-sleep");
 			if (IS_ERR_OR_NULL(sunxi_internal_codec->aif2sleep_pinstate)) {
 				pr_warn("[audio-codec]lookup aif2-sleep state failed\n");
 				return -EINVAL;
 			}
 		}
+		line();
 		ret = pinctrl_select_state(sunxi_internal_codec->pinctrl, sunxi_internal_codec->aif2_pinstate);
 		if (ret) {
 			pr_warn("[audio-codec]select aif2-default state failed\n");
 			return ret;
 		}
 	}
+	line();
 	if (sunxi_internal_codec->aif_config.aif3config) {
+		line();
 		if (!sunxi_internal_codec->aif3_pinstate){
+			line();
 			sunxi_internal_codec->aif3_pinstate = pinctrl_lookup_state(sunxi_internal_codec->pinctrl, "aif3-default");
 			if (IS_ERR_OR_NULL(sunxi_internal_codec->aif3_pinstate)) {
+				line();
 				pr_warn("[audio-codec]lookup aif3-default state failed\n");
 				return -EINVAL;
 			}
 		}
 
+		line();
 		if (!sunxi_internal_codec->aif3sleep_pinstate){
+			line();
 			sunxi_internal_codec->aif3sleep_pinstate = pinctrl_lookup_state(sunxi_internal_codec->pinctrl, "aif3-sleep");
 			if (IS_ERR_OR_NULL(sunxi_internal_codec->aif3sleep_pinstate)) {
 				pr_warn("[audio-codec]lookup aif3-sleep state failed\n");
@@ -341,12 +379,14 @@ static int codec_init(struct sunxi_codec *sunxi_internal_codec)
 			}
 		}
 
+		line();
 		ret = pinctrl_select_state(sunxi_internal_codec->pinctrl, sunxi_internal_codec->aif3_pinstate);
 		if (ret) {
 			pr_warn("[audio-codec]select aif3-default state failed\n");
 			return ret;
 		}
 	}
+	line();
 
 	return ret;
 }
@@ -574,13 +614,13 @@ static int ac_headphone_event(struct snd_soc_dapm_widget *w,
 	case SND_SOC_DAPM_POST_PMU:
 		/*open*/
 		//snd_soc_update_bits(codec, HP_PA_CTRL, (0xf<<HPOUTPUTENABLE), (0xf<<HPOUTPUTENABLE));
-		snd_soc_update_bits(codec, HP_CTRL, (0x1<<HPPA_EN), (0x1<<HPPA_EN));
+		//snd_soc_update_bits(codec, HP_CTRL, (0x1<<HPPA_EN), (0x1<<HPPA_EN));
 		msleep(10);
 		snd_soc_update_bits(codec, MIX_DAC_CTRL, (0x3<<LHPPAMUTE), (0x3<<LHPPAMUTE));
 		break;
 	case SND_SOC_DAPM_PRE_PMD:
 		/*close*/
-		snd_soc_update_bits(codec, HP_CTRL, (0x1<<HPPA_EN), (0x0<<HPPA_EN));
+		//snd_soc_update_bits(codec, HP_CTRL, (0x1<<HPPA_EN), (0x0<<HPPA_EN));
 		//snd_soc_update_bits(codec, HP_PA_CTRL, (0xf<<HPOUTPUTENABLE), (0x0<<HPOUTPUTENABLE));
 		snd_soc_update_bits(codec, MIX_DAC_CTRL, (0x3<<LHPPAMUTE), (0x0<<LHPPAMUTE));
 		break;
@@ -618,7 +658,13 @@ static int ac_speaker_event(struct snd_soc_dapm_widget *w,
 	switch (event) {
 		case SND_SOC_DAPM_POST_PMU:
 			sunxi_internal_codec->spkenable = true;
-			msleep(50);
+			/* for pop */
+			if (sunxi_internal_codec->first_speaker_event == 0) {
+				msleep(800);
+				sunxi_internal_codec->first_speaker_event = 1;
+			} else {
+				msleep(50);
+			}
 			if (spk_gpio.cfg)
 				gpio_set_value(spk_gpio.gpio, 1);
 
@@ -2270,6 +2316,8 @@ static int __init sunxi_internal_codec_probe(struct platform_device *pdev)
 			pr_err("[%s]: cpvdd:regulator_enable() failed!\n",__func__);
 			goto err1;
 		}
+		_debug("vcc-cpvdd voltage: %d", (int)(unsigned long)(
+					regulator_get_voltage(sunxi_internal_codec->vol_supply.cpvdd)));
 	}
 
 	sunxi_internal_codec->vol_supply.avcc = regulator_get(NULL, "vcc-avcc");
@@ -2283,6 +2331,8 @@ static int __init sunxi_internal_codec_probe(struct platform_device *pdev)
 			pr_err("[%s]: avcc:regulator_enable() failed!\n",__func__);
 			goto err1;
 		}
+		_debug("vcc-avcc voltage: %d\n", (int)(unsigned long)(
+					regulator_get_voltage(sunxi_internal_codec->vol_supply.avcc)));
 	}
 
 	sunxi_internal_codec->codec_abase = NULL;
@@ -2292,6 +2342,8 @@ static int __init sunxi_internal_codec_probe(struct platform_device *pdev)
 		pr_err("[audio-codec]Can't map codec digital registers\n");
 	} else {
 		codec_digitaladress = sunxi_internal_codec->codec_dbase;
+		_debug("codec_digitaladdress %p\n", ((void *)(unsigned long)
+					codec_digitaladress));
 	}
 	sunxi_internal_codec->codec_abase = of_iomap(node, 1);
 	if (NULL == sunxi_internal_codec->codec_abase) {
@@ -2305,12 +2357,30 @@ static int __init sunxi_internal_codec_probe(struct platform_device *pdev)
 		ret = PTR_ERR(sunxi_internal_codec->srcclk);
 		goto err1;
 	}
+	/* Buddy, Modify argument of_clk_get(node, 1) */
+	sunxi_internal_codec->hp_en = of_clk_get(node,0);
+	if (IS_ERR(sunxi_internal_codec->hp_en)){
+		dev_err(&pdev->dev, "[audio-codec]Can't get hp_en clocks\n");
+		ret = PTR_ERR(sunxi_internal_codec->hp_en);
+		goto err1;
+	}
+	{
+		/* Do a test for clk */
+		int clk_val;
+
+		if(!of_property_read_u32_index(node, "clocks", 0, &clk_val))
+			_debug("proptry of clk[1]: %d\n", clk_val);
+
+		if(!of_property_read_u32_index(node, "clocks", 1, &clk_val))
+			_debug("proptry of clk[2]: %d\n", clk_val);
+	}
 	/*initial speaker gpio */
 	spk_gpio.gpio = of_get_named_gpio_flags(node, "gpio-spk", 0, (enum of_gpio_flags *)&config);
 	if (!gpio_is_valid(spk_gpio.gpio)) {
 		pr_err("failed to get gpio-spk gpio from dts,spk_gpio:%d\n",spk_gpio.gpio);
 		spk_gpio.cfg = 0;
 	} else {
+		_debug("spk_gpio is %d\n", spk_gpio.gpio);
 		ret = devm_gpio_request(&pdev->dev, spk_gpio.gpio, "SPK");
 		if (ret) {
 			spk_gpio.cfg = 0;
@@ -2320,6 +2390,7 @@ static int __init sunxi_internal_codec_probe(struct platform_device *pdev)
 			spk_gpio.cfg = 1;
 			gpio_direction_output(spk_gpio.gpio, 1);
 			gpio_set_value(spk_gpio.gpio, 0);
+			_debug("current gpio value %d\n", __gpio_get_value(spk_gpio.gpio));
 		}
 	}
 
@@ -2330,6 +2401,7 @@ static int __init sunxi_internal_codec_probe(struct platform_device *pdev)
 		goto err1;
 	} else {
 		sunxi_internal_codec->gain_config.headphonevol = temp_val;
+		_debug("headphonevol %d\n", temp_val);
 	}
 	ret = of_property_read_u32(node, "spkervol",&temp_val);
 	if (ret < 0) {
@@ -2338,6 +2410,7 @@ static int __init sunxi_internal_codec_probe(struct platform_device *pdev)
 		goto err1;
 	} else {
 		sunxi_internal_codec->gain_config.spkervol = temp_val;
+		_debug("spkervol %d\n", temp_val);
 	}
 
 	ret = of_property_read_u32(node, "earpiecevol",&temp_val);
@@ -2356,6 +2429,7 @@ static int __init sunxi_internal_codec_probe(struct platform_device *pdev)
 		goto err1;
 	} else {
 		sunxi_internal_codec->gain_config.maingain = temp_val;
+		_debug("maingain %d\n", temp_val);
 	}
 
 	ret = of_property_read_u32(node, "headsetmicgain",&temp_val);
@@ -2365,6 +2439,7 @@ static int __init sunxi_internal_codec_probe(struct platform_device *pdev)
 		goto err1;
 	} else {
 		sunxi_internal_codec->gain_config.headsetmicgain = temp_val;
+		_debug("headsetmicgain %d\n", temp_val);
 	}
 
 	ret = of_property_read_u32(node, "adcagc_cfg",&temp_val);
@@ -2374,6 +2449,7 @@ static int __init sunxi_internal_codec_probe(struct platform_device *pdev)
 		goto err1;
 	} else {
 		sunxi_internal_codec->hwconfig.adcagc_cfg = temp_val;
+		_debug("adcagc_cfg %d\n", temp_val);
 	}
 
 	ret = of_property_read_u32(node, "adcdrc_cfg",&temp_val);
@@ -2383,6 +2459,7 @@ static int __init sunxi_internal_codec_probe(struct platform_device *pdev)
 		goto err1;
 	} else {
 		sunxi_internal_codec->hwconfig.adcdrc_cfg = temp_val;
+		_debug("adcdrc_cfg %d\n", temp_val);
 	}
 
 	ret = of_property_read_u32(node, "adchpf_cfg",&temp_val);
@@ -2392,6 +2469,7 @@ static int __init sunxi_internal_codec_probe(struct platform_device *pdev)
 		goto err1;
 	} else {
 		sunxi_internal_codec->hwconfig.adchpf_cfg = temp_val;
+		_debug("adchpf_cfg %d\n", temp_val);
 	}
 
 	ret = of_property_read_u32(node, "dacdrc_cfg",&temp_val);
@@ -2401,6 +2479,7 @@ static int __init sunxi_internal_codec_probe(struct platform_device *pdev)
 		goto err1;
 	} else {
 		sunxi_internal_codec->hwconfig.dacdrc_cfg = temp_val;
+		_debug("dacdrc_cfg %d\n", temp_val);
 	}
 
 	ret = of_property_read_u32(node, "dachpf_cfg",&temp_val);
@@ -2410,6 +2489,7 @@ static int __init sunxi_internal_codec_probe(struct platform_device *pdev)
 		goto err1;
 	} else {
 		sunxi_internal_codec->hwconfig.dachpf_cfg = temp_val;
+		_debug("dachpf_cfg %d\n", temp_val);
 	}
 
 	ret = of_property_read_u32(node, "aif2config",&temp_val);
@@ -2419,6 +2499,7 @@ static int __init sunxi_internal_codec_probe(struct platform_device *pdev)
 		goto err1;
 	} else {
 		sunxi_internal_codec->aif_config.aif2config = temp_val;
+		_debug("aif2config %d\n", temp_val);
 	}
 
 	ret = of_property_read_u32(node, "aif3config",&temp_val);
@@ -2428,6 +2509,7 @@ static int __init sunxi_internal_codec_probe(struct platform_device *pdev)
 		goto err1;
 	} else {
 		sunxi_internal_codec->aif_config.aif3config = temp_val;
+		_debug("aif3config %d\n", temp_val);
 	}
 
 	ret = of_property_read_u32(node, "aif1_lrlk_div",&temp_val);
@@ -2437,6 +2519,7 @@ static int __init sunxi_internal_codec_probe(struct platform_device *pdev)
 		goto err1;
 	} else {
 		sunxi_internal_codec->aif1_lrlk_div = temp_val;
+		_debug("aif1_lrlk_div %d\n", temp_val);
 	}
 	ret = of_property_read_u32(node, "aif2_lrlk_div",&temp_val);
 	if (ret < 0) {
@@ -2445,6 +2528,7 @@ static int __init sunxi_internal_codec_probe(struct platform_device *pdev)
 		goto err1;
 	} else {
 		sunxi_internal_codec->aif2_lrlk_div = temp_val;
+		_debug("aif2_lrlk_div %d\n", temp_val);
 	}
 
 	ret = of_property_read_u32(node, "pa_sleep_time",&temp_val);
@@ -2454,15 +2538,8 @@ static int __init sunxi_internal_codec_probe(struct platform_device *pdev)
 		goto err1;
 	} else {
 		sunxi_internal_codec->pa_sleep_time = temp_val;
+		_debug("pa_sleep_time %d\n", temp_val);
 	}
-	    ret = of_property_read_u32(node, "dac_digital_vol",&temp_val);
-                if (ret < 0) {
-                    pr_err("[audio-codec]dac_digital_vol configurations missing or invalid.\n");
-                    ret = -EINVAL;
-                    goto err1;
-                } else {
-                     sunxi_internal_codec->gain_config.dac_digital_vol = temp_val;
-                }
 
 	ret = of_property_read_u32(node, "dac_digital_vol",&temp_val);
 	if (ret < 0) {
@@ -2471,6 +2548,7 @@ static int __init sunxi_internal_codec_probe(struct platform_device *pdev)
 		goto err1;
 	} else {
 		sunxi_internal_codec->gain_config.dac_digital_vol = temp_val;
+		_debug("dac_digital_vol %d\n", temp_val);
 	}
 
 	pr_debug("headphonevol:%d,spkervol:%d, earpiecevol:%d maingain:%d headsetmicgain:%d \
@@ -2519,9 +2597,11 @@ static void sunxi_internal_codec_shutdown(struct platform_device *pdev)
 {
 	struct sunxi_codec * sunxi_internal_codec = dev_get_drvdata(&pdev->dev);
 
-	snd_soc_update_bits(sunxi_internal_codec->codec, HP_CTRL, (0x1<<HPPA_EN), (0x0<<HPPA_EN));
+//	snd_soc_update_bits(sunxi_internal_codec->codec, HP_CTRL, (0x1<<HPPA_EN), (0x0<<HPPA_EN));
 	snd_soc_update_bits(sunxi_internal_codec->codec, MIX_DAC_CTRL, (0x3<<LHPPAMUTE), (0x0<<LHPPAMUTE));
 	snd_soc_update_bits(sunxi_internal_codec->codec, JACK_MIC_CTRL, (0x1<<HMICBIASEN), (0x0<<HMICBIASEN));
+	if (sunxi_internal_codec->hp_en)
+		clk_disable_unprepare(sunxi_internal_codec->hp_en);
 	if (spk_gpio.cfg)
 		gpio_set_value(spk_gpio.gpio, 0);
 }

@@ -257,11 +257,11 @@ static irqreturn_t jack_interrupt(int irq, void *dev_id)
 		if (abs(tv.tv_sec -ctx->tv_headset_plugin.tv_sec) > 2) {
 			tempdata =snd_soc_read(ctx->codec, SUNXI_HMIC_STS);
 			tempdata = (tempdata&0x1f00)>>8;
-			if (tempdata == 13) {
+			if (tempdata == 2) {
 				ctx->key_hook = 0;
 				ctx->key_voldown = 0;
 				ctx->key_volup ++;
-				if (ctx->key_volup == 1) {
+				if (ctx->key_volup == 60) {
 					pr_debug("Volume + !!\n");
 					ctx->key_volup = 0;
 					ctx->switch_status |= SND_JACK_BTN_1;
@@ -269,11 +269,11 @@ static irqreturn_t jack_interrupt(int irq, void *dev_id)
 					ctx->switch_status &= ~SND_JACK_BTN_1;
 					snd_jack_report(ctx->jack.jack, ctx->switch_status);
 				}
-			} else if ((tempdata == 16) || (tempdata == 15)) {
+			} else if (tempdata == 5) {
 				ctx->key_volup = 0;
 				ctx->key_hook = 0;
 				ctx->key_voldown ++;
-				if (ctx->key_voldown == 1) {
+				if (ctx->key_voldown == 60) {
 					pr_debug("Volume - !!\n");
 					ctx->key_voldown = 0;
 					ctx->switch_status |= SND_JACK_BTN_2;

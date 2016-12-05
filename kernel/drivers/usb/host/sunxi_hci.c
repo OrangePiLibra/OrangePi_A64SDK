@@ -616,9 +616,16 @@ void sunxi_set_host_hisc_rdy(struct sunxi_hci_hcd *sunxi_hci, int is_on)
 
 void sunxi_set_host_vbus(struct sunxi_hci_hcd *sunxi_hci, int is_on)
 {
+	/*
+	 * BUG: USB doesn't inititalize on boot time.
+	 * Test: Close this code segment
+	 * Buddy.Zhang
+	 */
+#if 1
 	if(sunxi_hci->drv_vbus_gpio_valid){
 		__gpio_set_value(sunxi_hci->drv_vbus_gpio_set.gpio.gpio, is_on);
 	}
+#endif
 }
 
 static void __sunxi_set_vbus(struct sunxi_hci_hcd *sunxi_hci, int is_on)
@@ -666,9 +673,16 @@ static void __sunxi_set_vbus(struct sunxi_hci_hcd *sunxi_hci, int is_on)
 	}
 #endif
 
+/*
+ * BUG: OrangePi2 USB dones't work on initialize time.
+ * Test: Close this code segment.
+ * Buddy.Zhang
+ */
+#if 1
 	if(sunxi_hci->drv_vbus_gpio_valid){
 		__gpio_set_value(sunxi_hci->drv_vbus_gpio_set.gpio.gpio, is_on);
 	}
+#endif
 
 	return;
 }
