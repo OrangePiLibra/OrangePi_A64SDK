@@ -19,13 +19,14 @@ UBOOT=$ROOT/u-boot
 TOOLS=$ROOT/toolchain/gcc-linaro-aarch/gcc-linaro/bin/arm-linux-gnueabihf-
 
 # Perpar souce code
-if [ -d $UBOOT ]; then
-	echo "U-boot exist and compile u-boot"
-else
-	echo "u-boot doesn't exist, pls perpare u-boot source code."
+if [ ! -d $UBOOT ]; then
+	whiptail --title "OrangePi Build System" \
+		--msgbox "u-boot doesn't exist, pls perpare u-boot source code." \
+		10 50 0
 	exit 0
 fi
 
+clear
 echo "Compile U-boot......"
 if [ ! -f $UBOOT/u-boot-sun50iw1p1.bin ]; then
 	make -C $UBOOT ARCH=arm CROSS_COMPILE=$TOOLS sun50iw1p1_config
@@ -76,9 +77,8 @@ $MERGE_TOOLS/merge_uboot  u-boot-merged.bin  scp.bin  u-boot-merged2.bin scp
 $MERGE_TOOLS/update_uboot_fdt u-boot-merged2.bin orangepi.dtb u-boot-with-dtb.bin
 
 # Merge uboot and sys_config.fex
-$MERGE_TOOLS/update_uboot u-boot-with-dtb.bin sys_config.bin
+#$MERGE_TOOLS/update_uboot u-boot-with-dtb.bin sys_config.bin
 
-echo "Finish merge uboot with different binary..."
 
 # Clear build space
 rm -rf u-boot-merg*
@@ -90,4 +90,5 @@ rm -rf scp.bin
 
 # Change to scripts direct.
 cd -
-echo "Finish build Uboot. Create $BUILD/u-boot-with-dtb.bin"
+whiptail --title "OrangePi Build System" \
+	--msgbox "Build uboot finish. The output path: $BUILD/u-boot-with-dtb.bin" 10 60 0
